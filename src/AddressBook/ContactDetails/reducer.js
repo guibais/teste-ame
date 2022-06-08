@@ -14,18 +14,18 @@ const reducer = (state = initialState, action) => {
 
   switch (type) {
 
-    // TODO something is missing here
+    // FIXEDTODO something is missing here
     case FETCH_CONTACT_DETAILS__START:
       return {
         ...state,
         fetchedContact: null,
       };
 
-    // TODO something is wrong here
+    // FIXEDTODO something is wrong here
     case FETCH_CONTACT_DETAILS__SUCCESS:
       return {
         ...state,
-        fetchedContact: null,
+        fetchedContact: payload.contactDetails,
       };
 
     case FETCH_CONTACT_DETAILS__FAILURE:

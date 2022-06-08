@@ -2,58 +2,75 @@ import { actions as searchActions } from "./SearchContacts";
 import { actions as contactDetailsActions } from "./ContactDetails";
 
 export const updateSearchPhrase = newPhrase =>
-  (dispatch, getState, { httpApi }) => {
+  async (dispatch, getState, { httpApi, debounce }) => {
+    const dispatchUpdate = debounce(
+      httpApi.getFirst5MatchingContacts,
+    300,
+    );
     dispatch(
       searchActions.updateSearchPhraseStart({ newPhrase }),
-    );
-    httpApi.getFirst5MatchingContacts({ namePart: newPhrase })
+    )
+    dispatchUpdate({ namePart: newPhrase })
       .then(({ data }) => {
         const matchingContacts = data.map(contact => ({
           id: contact.id,
           value: contact.name,
         }));
-        // TODO something is wrong here
+        // FIXEDTODO something is wrong here
         dispatch(
-          searchActions.updateSearchPhraseSuccess({ matchingContacts: [] }),
+          searchActions.updateSearchPhraseSuccess({ matchingContacts }),
         );
       })
       .catch(() => {
-        // TODO something is missing here
+        // FIXEDTODO something is missing here
+        dispatch(
+          searchActions.updateSearchPhraseFailure({ newPhrase }),
+        );
       });
+
+    
   };
 
 export const selectMatchingContact = selectedMatchingContact =>
-  (dispatch, getState, { httpApi, dataCache }) => {
+  (dispatch, getState, { httpApi, dataCache, }) => {
 
-    // TODO something is missing here
+    // FIXEDTODO something is missing here
     const getContactDetails = ({ id }) => {
+      const cachedContact = dataCache.load({ key: selectedMatchingContact.id })
+      if(cachedContact) {
+        return Promise.resolve(cachedContact);
+      }
       return httpApi
-          .getContact({ contactId: selectedMatchingContact.id })
-          .then(({ data }) => ({
+          .getContact({ contactId: id })
+          .then(({ data }) => {
+            return {
             id: data.id,
             name: data.name,
             phone: data.phone,
             addressLines: data.addressLines,
-          }));
+          }
+          });
     };
 
     dispatch(
       searchActions.selectMatchingContact({ selectedMatchingContact }),
     );
-
     dispatch(
       contactDetailsActions.fetchContactDetailsStart(),
     );
 
+
     getContactDetails({ id: selectedMatchingContact.id })
       .then((contactDetails) => {
-        // TODO something is missing here
+        // FIXEDTODO something is missing here
         dataCache.store({
           key: contactDetails.id,
+          value: contactDetails
+
         });
-        // TODO something is wrong here
+        // FIXEDTODO something is wrong here
         dispatch(
-          contactDetailsActions.fetchContactDetailsFailure(),
+          contactDetailsActions.fetchContactDetailsSuccess({contactDetails: dataCache.load({ key: contactDetails.id })}),
         );
       })
       .catch(() => {

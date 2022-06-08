@@ -20,8 +20,9 @@ export const setupStore = ({ httpApi }) => {
     reduxThunk.withExtraArgument({
       // TODO something is missing here
       httpApi: httpApi,
+      debounce,
       dataCache: new DataCache(),
-    }),
+    }), 
   );
 
   if (process.env.NODE_ENV === "development") {

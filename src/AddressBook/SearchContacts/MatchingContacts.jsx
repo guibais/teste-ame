@@ -12,8 +12,10 @@ const MatchingContacts = (
     downshiftGetItemProps,
   },
 ) => {
-  // TODO something is missing here
-
+  // FIXEDTODO something is missing here
+  if(!data || data.length === 0) {
+    return null;
+  }
   return (
     <ul
       {...downshiftGetMenuProps()}
@@ -24,11 +26,12 @@ const MatchingContacts = (
           {...downshiftGetItemProps({
             key: item.id,
             item: item,
-            // TODO something is wrong here
+            // FIXEDTODO something is wrong here
             className: classNames(
+              
               "MatchingContacts_item",
               {
-                "MatchingContacts_item_highlighted": false,
+                "MatchingContacts_item_highlighted": highlightedIndex === index,
               }),
           })}
         >
